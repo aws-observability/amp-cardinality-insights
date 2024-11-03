@@ -3,6 +3,17 @@
 This project helps you have visibility into high cardinality metrics from an
 Amazon Managed Service for Prometheus workspace.
 
+## Support & Feedback
+
+**Amazon Managed Service for Prometheus - Cardinality insights** is maintained
+by AWS Solution Architects. It is not part of an AWS service and support is
+provided best-effort by the community.
+
+To post feedback, submit feature ideas, or report bugs, please use the Issues
+section of this GitHub repo.
+
+If you are interested in contributing, see the Contribution guide.
+
 ## How it works
 
 This project proposes a serverless solution that you deploy and operate on your
@@ -39,10 +50,23 @@ To deploy make sure to have the following pre-requisites:
 ./deploy.sh REGION PROMETHEUS_WORKSPACE_ID
 ```
 
-To provide IAM roles to the Lambda functions, use these environment variables
-below. You can see the minimum permissions required for each function:
+## Import Grafana dashboard
 
-### METRIC_NAMES_FUNCTION_ROLE_ARN
+- [Create an Amazon Managed Grafana Workspace](https://docs.aws.amazon.com/grafana/latest/userguide/AMG-create-workspace.html)
+- Setup your Amazon Managed Service for Prometheus data source
+- Import the JSON [Grafana dashboard](./dashboard/dashboard.json)
+- Click on a metric to have visibility into the cardinality details
+- Explore which cardinalities can be reduced
+
+![explore](assets/card.gif)
+
+
+## Lambda permissions
+
+To manually provide IAM roles to the Lambda functions, use these environment
+variables below. You can see the minimum permissions required for each function:
+
+### `METRIC_NAMES_FUNCTION_ROLE_ARN`
 
 - Lambda basic execution role
 
@@ -104,7 +128,7 @@ Used to sign AMP queries
 }
 ```
 
-### COUNT_METRICS_FUNCTION_ROLE_ARN
+### `COUNT_METRICS_FUNCTION_ROLE_ARN`
 
 - Lambda basic execution role
 
@@ -182,7 +206,7 @@ Used to sign AMP queries
 }
 ```
 
-### AGGREGATE_COUNT_FUNCTION_ROLE_ARN
+### `AGGREGATE_COUNT_FUNCTION_ROLE_ARN`
 
 - Lambda basic execution role
 
@@ -220,7 +244,7 @@ Used to sign AMP queries
 }
 ```
 
-### INGEST_AMP_FUNCTION_ROLE_ARN
+### `INGEST_AMP_FUNCTION_ROLE_ARN`
 
 - Lambda basic execution role
 
@@ -254,16 +278,6 @@ Used to sign AMP queries
     ]
 }
 ```
-
-## Import Grafana dashboard
-
-- [Create an Amazon Managed Grafana Workspace](https://docs.aws.amazon.com/grafana/latest/userguide/AMG-create-workspace.html)
-- Setup your Amazon Managed Service for Prometheus data source
-- Import the JSON [Grafana dashboard](./dashboard/dashboard.json)
-- Click on a metric to have visibility into the cardinality details
-- Explore which cardinalities can be reduced
-
-![explore](assets/card.gif)
 
 ## Teardown
 
