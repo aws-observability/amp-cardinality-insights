@@ -10,15 +10,15 @@ func TestTopN(t *testing.T) {
 
 	//test cases
 	tests := map[string]struct {
-		input    map[string]int64
+		input    map[string]int
 		expected CardinalityList
 	}{
 		"empty list": {
-			input:    map[string]int64{},
+			input:    map[string]int{},
 			expected: CardinalityList{},
 		},
 		"example1": {
-			input: map[string]int64{
+			input: map[string]int{
 				"a": 1,
 				"b": 50,
 				"c": 15,
@@ -30,7 +30,7 @@ func TestTopN(t *testing.T) {
 			},
 		},
 		"example2": {
-			input: map[string]int64{
+			input: map[string]int{
 				"a": 1,
 				"b": 50,
 				"c": 15,
