@@ -1,3 +1,8 @@
 .aws-sam
 .vscode
 collector.yaml
+
+# Go binaries
+lambda/count-metrics/count-metrics
+lambda/aggregate-counts/aggregate-counts
+lambda/metric-names/metric-names
