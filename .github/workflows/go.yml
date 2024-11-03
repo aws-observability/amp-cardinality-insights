@@ -31,7 +31,7 @@ jobs:
       - name: Get directories for evaluation
         id: dirs
         run: |
-          DIRS=$(python3 .github/workflows/plan-examples.py)
+          DIRS=$(python3 .github/workflows/get-dirs.py)
           echo "directories=$DIRS" >> $GITHUB_OUTPUT
 
   precommit:
@@ -45,7 +45,9 @@ jobs:
     name: Test and build
     runs-on: ubuntu-latest
     needs: getDirs
-    matrix:
+    strategy:
+      fail-fast: false
+      matrix:
         directory: ${{ fromJson(needs.getDirs.outputs.directories) }}
     steps:
       - name: Build
