@@ -23,7 +23,5 @@ repos:
     rev: v1.0.2
     hooks:
       - id: go-fmt-import
-      - id: go-vet
-        #- id: go-lint
-      - id: go-unit-tests
+      - id: go-lint
       - id: go-static-check # install https://staticcheck.io/docs/
