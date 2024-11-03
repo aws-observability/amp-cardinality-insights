@@ -19,7 +19,7 @@ jobs:
       directories: ${{ steps.dirs.outputs.directories }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Get directories for evaluation
         id: dirs
         run: |
@@ -32,9 +32,9 @@ jobs:
     needs: getDirs
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: 1.21
       - name: setup revive
@@ -53,15 +53,13 @@ jobs:
         directory: ${{ fromJson(needs.getDirs.outputs.directories) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Build
-        if: steps.changes.outputs.src== 'true'
         run: |
           cd ${{ matrix.directory }}
           ls -la
           go build -v .
       - name: Test
-        if: steps.changes.outputs.src== 'true'
         run: |
           cd ${{ matrix.directory }}
           go test -v ./... -cover
