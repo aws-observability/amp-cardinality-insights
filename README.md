@@ -7,7 +7,7 @@ Amazon Managed Service for Prometheus workspace.
 
 **Amazon Managed Service for Prometheus - Cardinality insights** is maintained
 by AWS Solution Architects. It is not part of an AWS service and support is
-provided best-effort by the community.
+provided as best-effort by the community.
 
 To post feedback, submit feature ideas, or report bugs, please use the Issues
 section of this GitHub repo.
