@@ -17,7 +17,7 @@ command -v sam >/dev/null 2>&1 ||
 
 AWS_REGION=$1
 PROMETHEUS_WORKSPACE_ID=$2
-STACK_NAME="${3:-'amp-cardinality-insights'}"
+STACK_NAME="${3:-amp-cardinality-insights}"
 
 echo "Deploying to AWS region ${AWS_REGION} with Prometheus workspace ID ${PROMETHEUS_WORKSPACE_ID}"
 
