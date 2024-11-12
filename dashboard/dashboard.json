@@ -1,59 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_AWS-OBSERVABILITY-ACCELERATOR",
-      "label": "aws-observability-accelerator",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__elements": {},
-  "__requires": [
-    {
-      "type": "panel",
-      "id": "bargauge",
-      "name": "Bar gauge",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "cloudwatch",
-      "name": "CloudWatch",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "gauge",
-      "name": "Gauge",
-      "version": ""
-    },
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "9.4.7"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "table",
-      "name": "Table",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -80,14 +25,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 31,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+        "uid": "${prometheus_datasource}"
       },
       "description": "Click on a series to view detailed cardinality in the explorer view. You can take a look at the label values and reduce non used labels",
       "fieldConfig": {
@@ -95,12 +40,321 @@
           "color": {
             "mode": "continuous-GrYlRd"
           },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "fieldMinMax": false,
           "links": [
             {
               "title": "",
-              "url": "/explore?orgId=1&left=%7B%22datasource%22:%221bec650f-14c4-4195-a9d2-1b83ba91e708%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%221bec650f-14c4-4195-a9d2-1b83ba91e708%22%7D,%22editorMode%22:%22code%22,%22expr%22:%22${__field.labels.metric_name}%7B%7D%22,%22legendFormat%22:%22__auto%22,%22range%22:false,%22instant%22:true,%22exemplar%22:false%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
+              "url": "/d/qbYzyPXVz/e1e7ac14-3e68-5eed-af46-3b1dbc97ff37?var-metric=${__data.fields[\"Field\"]}&${datasource:queryparam}&${job:queryparam}"
             }
           ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "lcd",
+                  "type": "gauge",
+                  "valueDisplayMode": "color"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 21,
+        "w": 14,
+        "x": 0,
+        "y": 0
+      },
+      "id": 33,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Last"
+          }
+        ]
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "topk(20, metrics_cardinality_count{})",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{metric_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top 20 high cardinality metrics",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "labelsToFields": false,
+            "reducers": [
+              "last"
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Distinct Count"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Distinct Count"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "A sample observed value"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "center"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 21,
+        "w": 10,
+        "x": 14,
+        "y": 0
+      },
+      "id": 34,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus_datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "$metric",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Cardinality for selected metric by label",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "labelsToFields": true,
+            "reducers": [
+              "allValues"
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": false
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "reduce",
+          "options": {
+            "includeTimeField": false,
+            "labelsToFields": false,
+            "mode": "seriesToRows",
+            "reducers": [
+              "distinctCount",
+              "last"
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "Distinct Count": 1,
+              "Field": 0,
+              "Last": 2
+            },
+            "renameByName": {
+              "Distinct Count": "Cardinality (distinct values count)",
+              "Field": "Label",
+              "Last": "A sample observed value"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prometheus_datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -119,53 +373,44 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 18,
-        "w": 11,
+        "h": 7,
+        "w": 13,
         "x": 0,
-        "y": 0
+        "y": 21
       },
-      "id": 33,
-      "links": [],
+      "id": 26,
       "options": {
-        "displayMode": "lcd",
-        "minVizHeight": 10,
-        "minVizWidth": 0,
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        "showUnfilled": true
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
-      "pluginVersion": "9.4.7",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+            "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "exemplar": false,
-          "expr": "topk(20, metrics_cardinality_count{})",
-          "format": "time_series",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "{{metric_name}}",
+          "expr": "max by (job) (scrape_series_added{job=~\"^$job$\"})",
+          "legendFormat": "{{job}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Top 20 high cardinality metrics",
-      "transformations": [],
-      "type": "bargauge"
+      "title": "Scrape series per job",
+      "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+        "uid": "${prometheus_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -173,6 +418,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -186,6 +432,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineStyle": {
               "fill": "solid"
@@ -223,16 +470,16 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 11,
-        "w": 13,
-        "x": 11,
-        "y": 0
+        "h": 7,
+        "w": 11,
+        "x": 13,
+        "y": 21
       },
       "id": 31,
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "table",
+          "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
@@ -246,26 +493,25 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+            "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(20, metrics_cardinality:topk20{})",
+          "expr": "count by (metric_name) (metrics_cardinality_count{} offset 3d)",
           "hide": false,
           "instant": false,
-          "legendFormat": "{{name_label}}",
+          "legendFormat": "{{metric_name}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Top 20 high cardinality metrics",
-      "transformations": [],
+      "title": "Metrics variance",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+        "uid": "${prometheus_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -273,6 +519,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -286,6 +533,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -321,11 +569,11 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 13,
-        "x": 11,
-        "y": 11
+        "w": 12,
+        "x": 0,
+        "y": 28
       },
-      "id": 26,
+      "id": 35,
       "options": {
         "legend": {
           "calcs": [],
@@ -342,16 +590,17 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+            "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
-          "expr": "max by (job) (scrape_series_added{job=~\"^$job$\"})",
-          "legendFormat": "{{job}}",
+          "expr": "sum(scrape_series_added)",
+          "instant": false,
+          "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Scrape series per job",
+      "title": "Active series metrics",
       "type": "timeseries"
     },
     {
@@ -365,6 +614,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -378,6 +628,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -413,112 +664,9 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 9,
-        "x": 0,
-        "y": 18
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "alias": "",
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "$datasource"
-          },
-          "dimensions": {},
-          "expression": "SELECT SUM(ResourceCount) FROM SCHEMA(\"AWS/Usage\", Class,Resource,ResourceId,Service,Type) WHERE Type = 'Resource' AND ResourceId = '$WorkspaceID' AND Resource = 'ActiveSeries' AND Service = 'Prometheus' AND Class = 'None'",
-          "id": "",
-          "label": "",
-          "matchExact": true,
-          "metricEditorMode": 1,
-          "metricName": "",
-          "metricQueryType": 0,
-          "namespace": "",
-          "period": "",
-          "queryMode": "Metrics",
-          "refId": "A",
-          "region": "default",
-          "sqlExpression": "",
-          "statistic": "Average"
-        }
-      ],
-      "title": "Active Series Metrics",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "cloudwatch",
-        "uid": "$datasource"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 15,
-        "x": 9,
-        "y": 18
+        "w": 12,
+        "x": 12,
+        "y": 28
       },
       "id": 2,
       "options": {
@@ -562,80 +710,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 7,
-        "x": 0,
-        "y": 25
-      },
-      "id": 30,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": false
-      },
-      "pluginVersion": "9.4.7",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "sum(scrape_series_added)",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "scrape_series_added",
-          "range": false,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
-          },
-          "editorMode": "code",
-          "expr": "sum(scrape_samples_scraped)",
-          "hide": false,
-          "legendFormat": "scrape_samples_scraped",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "Scrape series per job",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+        "uid": "${prometheus_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -647,7 +722,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -661,14 +737,16 @@
       "gridPos": {
         "h": 7,
         "w": 8,
-        "x": 7,
-        "y": 25
+        "x": 0,
+        "y": 35
       },
       "id": 28,
       "options": {
         "displayMode": "basic",
+        "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -677,14 +755,16 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+            "uid": "${prometheus_datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -697,90 +777,19 @@
       ],
       "title": "alerts firing",
       "type": "bargauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
-      },
-      "description": "Helps finding out variance in samples collected between scrape intervals",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 9,
-        "x": 15,
-        "y": 25
-      },
-      "id": 27,
-      "options": {
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "frameIndex": 3,
-        "showHeader": true
-      },
-      "pluginVersion": "9.4.7",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
-          },
-          "editorMode": "code",
-          "expr": "topk(5, max_over_time(scrape_series_added[6m]))",
-          "legendFormat": "{{job}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "metrics variance over time per job",
-      "type": "table"
     }
   ],
   "refresh": "",
   "revision": 1,
-  "schemaVersion": 38,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "aws-observability-accelerator",
-          "value": "aws-observability-accelerator"
+          "value": "5b03f15c-c14e-4bfb-b3a9-cbe60503a979"
         },
         "hide": 0,
         "includeAll": false,
@@ -799,7 +808,7 @@
         "current": {
           "selected": false,
           "text": "aws-observability-accelerator-cloudwatch",
-          "value": "aws-observability-accelerator-cloudwatch"
+          "value": "2e8ba2d7-35b7-46a2-b074-66e350cb6737"
         },
         "hide": 0,
         "includeAll": false,
@@ -815,7 +824,11 @@
         "type": "datasource"
       },
       {
-        "current": {},
+        "current": {
+          "selected": true,
+          "text": "ws-c32b1e35-2c70-430b-ba88-015ca441f399",
+          "value": "ws-c32b1e35-2c70-430b-ba88-015ca441f399"
+        },
         "datasource": {
           "type": "cloudwatch",
           "uid": "$datasource"
@@ -848,10 +861,18 @@
       },
       {
         "allValue": ".*",
-        "current": {},
+        "current": {
+          "selected": false,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_AWS-OBSERVABILITY-ACCELERATOR}"
+          "uid": "${prometheus_datasource}"
         },
         "definition": "label_values(up, job)",
         "hide": 0,
@@ -869,6 +890,33 @@
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "container_tasks_state",
+          "value": "container_tasks_state"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${prometheus_datasource}"
+        },
+        "definition": "label_values(__name__)",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "metric",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(__name__)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
@@ -878,8 +926,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "AWS Observability Accelerator - AMP Ingestion Dashboard",
+  "title": "AMP Cardinality Insights",
   "uid": "qbYzyPXVz",
-  "version": 54,
+  "version": 74,
   "weekStart": ""
 }
