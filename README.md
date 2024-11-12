@@ -58,7 +58,8 @@ To deploy make sure to have the following pre-requisites:
 - Click on a metric to have visibility into the cardinality details
 - Explore which cardinalities can be reduced
 
-![explore](assets/card.gif)
+<img width="1914" alt="card" src="https://github.com/user-attachments/assets/db214c22-481c-43e2-8792-670deed8f75e">
+
 
 ## Teardown
 
