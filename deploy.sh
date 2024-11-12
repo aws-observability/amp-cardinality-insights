@@ -3,9 +3,7 @@
 set -euo pipefail
 
 usage(){
-    echo "usage ${0##*/} AWS_REGION PROMETHEUS_WORKSPACE_ID"
-    echo "> Ensure Function roles are set as environment variables"
-    echo "> METRIC_NAMES_FUNCTION_ROLE_ARN, COUNT_METRICS_FUNCTION_ROLE_ARN, AGGREGATE_COUNT_FUNCTION_ROLE_ARN, INGEST_AMP_FUNCTION_ROLE_ARN"
+    echo "usage ${0##*/} AWS_REGION PROMETHEUS_WORKSPACE_ID [CFN-stack-name]"
     return 1
 }
 
@@ -17,15 +15,9 @@ command -v aws >/dev/null 2>&1 ||
 command -v sam >/dev/null 2>&1 ||
     { echo >&2 "ERR: aws-sam is missing, aborting!"; exit 1; }
 
-# checking roles environment variables are set
-[ -z "${METRIC_NAMES_FUNCTION_ROLE_ARN}" ] && { echo >&2 "ERR: METRIC_NAMES_FUNCTION_ROLE_ARN is missing, aborting!"; exit 1; }
-[ -z "${COUNT_METRICS_FUNCTION_ROLE_ARN}" ] && { echo >&2 "ERR: COUNT_METRICS_FUNCTION_ROLE_ARN is missing, aborting!"; exit 1; }
-[ -z "${AGGREGATE_COUNT_FUNCTION_ROLE_ARN}" ] && { echo >&2 "ERR: AGGREGATE_COUNT_FUNCTION_ROLE_ARN is missing, aborting!"; exit 1; }
-[ -z "${INGEST_AMP_FUNCTION_ROLE_ARN}" ] && { echo >&2 "ERR: INGEST_AMP_FUNCTION_ROLE_ARN is missing, aborting!"; exit 1; }
-
-
 AWS_REGION=$1
 PROMETHEUS_WORKSPACE_ID=$2
+STACK_NAME="${3:-'amp-cardinality-insights'}"
 
 echo "Deploying to AWS region ${AWS_REGION} with Prometheus workspace ID ${PROMETHEUS_WORKSPACE_ID}"
 
@@ -41,11 +33,7 @@ sed -e "s/AMP_REGION/${AWS_REGION}/g" -e "s~AMP_REMOTE_WRITE_ENDPOINT~${PROMETHE
 cd lambda
 
 sam build
-sam sync --stack-name amp-ingest-insights \
+sam sync --stack-name $STACK_NAME \
     --parameter-overrides WorkspaceId=${PROMETHEUS_WORKSPACE_ID} \
-    --parameter-overrides MetricNamesFunctionRoleARN=${METRIC_NAMES_FUNCTION_ROLE_ARN} \
-    --parameter-overrides CountMetricsFunctionRoleARN=${COUNT_METRICS_FUNCTION_ROLE_ARN} \
-    --parameter-overrides AggregateCountFunctionRoleARN=${AGGREGATE_COUNT_FUNCTION_ROLE_ARN} \
-    --parameter-overrides IngestAMPFunctionRoleARN=${INGEST_AMP_FUNCTION_ROLE_ARN} \
     --no-watch
 cd -

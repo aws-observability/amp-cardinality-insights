@@ -1,42 +1,32 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  amp-ingestion-insights
+  amp-cardinality-insights
+  https://github.com/aws-observability/amp-cardinality-insights
 
-  Sample SAM Template for amp-ingestion-insights
-
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 5
+    Timeout: 30
     Tags:
-      Project: "AMP Ingestion Insights"
+      Project: "AMP-Cardinality-Insights"
+      Workspace: !Ref WorkspaceId
 
 Parameters:
   WorkspaceId:
     Type: String
     Description: Prometheus Workspace ID (not remote write URL)
-      #ScheduleRate:
-      #Type: String
-      #Default: rate(30 minutes)
-      #Description: Interval to run cardinality metrics collection
+  ScheduleRate:
+    Type: String
+    Default: rate(30 minutes)
+    Description: Interval to run cardinality metrics collection
   TopNCardValue:
     Type: Number
     Default: "10"
     Description: Top cardinality metrics contributors number (ex. Top 10, 20...)
-  MetricNamesFunctionRoleARN:
-    Type: String
-    Description: Lambda Function Role
-  CountMetricsFunctionRoleARN:
-    Type: String
-    Description: Lambda Function Role
   CountMetricsBatchSize:
     Type: Number
     Default: "10"
     Description: Lambda Batch size for CountMetricsFunction
-  AggregateCountFunctionRoleARN:
-    Type: String
-    Description: Lambda Function Role
   AggregateCountBatchSize:
     Type: Number
     Default: "10000"
@@ -45,13 +35,14 @@ Parameters:
     Type: Number
     Default: "300"
     Description: Maximum time in seconds to wait for batching
-  IngestAMPFunctionRoleARN:
-    Type: String
-    Description: Lambda Function Role
   IngestAMPBatchSize:
     Type: Number
     Default: "10"
     Description: Lambda Batch size for IngestAMPFunction
+  CardinalityMetricName:
+    Type: String
+    Default: "metrics_cardinality_count"
+    Description: Name of the new metric created on AMP
 
 Resources:
   MetricsCountQueue:
@@ -59,21 +50,21 @@ Resources:
     Properties:
       Tags:
         - Key: "Project"
-          Value: "AMP Ingestion Insights"
+          Value: "AMP-Cardinality-Insights"
 
   AggregateCountsQueue:
     Type: AWS::SQS::Queue
     Properties:
       Tags:
         - Key: "Project"
-          Value: "AMP Ingestion Insights"
+          Value: "AMP-Cardinality-Insights"
 
   IngestAMPQueue:
     Type: AWS::SQS::Queue
     Properties:
       Tags:
         - Key: "Project"
-          Value: "AMP Ingestion Insights"
+          Value: "AMP-Cardinality-Insights"
 
   MetricNamesFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -82,27 +73,37 @@ Resources:
       Handler: bootstrap
       Runtime: provided.al2
       Architectures:
-        - x86_64
-          #Events:
-          #CloudWatchEvent:
-          #Type: Schedule
-          #Properties:
-          #  Schedule: !Ref ScheduleRate
+        - arm64
+      Events:
+        CloudWatchEvent:
+          Type: Schedule
+          Properties:
+            Schedule: !Ref ScheduleRate
       Environment:
         Variables:
           AMP_WORKSPACE_ID: !Sub "${WorkspaceId}"
           SQS_QUEUE_URL: !Ref MetricsCountQueue
-      Role: !Ref MetricNamesFunctionRoleARN
+       Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt MetricsCountQueue.QueueName
+        - arn:aws:iam::aws:policy/AmazonPrometheusQueryAccess
+        - Statement:
+            - Sid: STS
+              Effect: Allow
+              Action:
+                - sts:GetSessionToken
+                - sts:GetCallerIdentity
+              Resource: "*"
 
   CountMetricsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: count-metrics/
       Handler: bootstrap
       Runtime: provided.al2
-      Timeout: 600
+      Timeout: 30
       Architectures:
-        - x86_64
+        - arm64
       Events:
         PollMetrics:
           Type: SQS
@@ -113,17 +114,29 @@ Resources:
         Variables:
           AMP_WORKSPACE_ID: !Sub "${WorkspaceId}"
           SQS_QUEUE_URL: !Ref AggregateCountsQueue
-      Role: !Ref CountMetricsFunctionRoleARN
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt MetricsCountQueue.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt AggregateCountsQueue.QueueName
+        - arn:aws:iam::aws:policy/AmazonPrometheusQueryAccess
+        - Statement:
+            - Sid: STS
+              Effect: Allow
+              Action:
+                - sts:GetSessionToken
+                - sts:GetCallerIdentity
+              Resource: "*"
 
   # this function does the first level reducing based on the message attributes
   AggregateCountFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: aggregate-counts/
       Handler: bootstrap
       Runtime: provided.al2
       Architectures:
-        - x86_64
+        - arm64
       Events:
         PollMetrics:
           Type: SQS
@@ -136,18 +149,24 @@ Resources:
           AGGREGATE_QUEUE_URL: !Ref AggregateCountsQueue
           INGEST_QUEUE_URL: !Ref IngestAMPQueue
           TOPN_CARDINALITY_VALUE: !Ref TopNCardValue
-      Role: !Ref AggregateCountFunctionRoleARN
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt AggregateCountsQueue.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt IngestAMPQueue.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt AggregateCountsQueue.QueueName
 
   IngestAMPFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/>
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ingest-amp/
       Handler: handler.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.12
       Architectures:
-        - x86_64
+        - arm64
       Layers:
-        - !Sub "arn:aws:lambda:${AWS::Region}:901920570463:layer:aws-otel-python-amd64-ver-1-19-0:1"
+        - !Sub "arn:aws:lambda:${AWS::Region}:901920570463:layer:aws-otel-python-arm64-ver-1-24-0:1"
       Events:
         PollMetrics:
           Type: SQS
@@ -158,4 +177,8 @@ Resources:
         Variables:
           AWS_LAMBDA_EXEC_WRAPPER: "/opt/otel-instrument"
           OPENTELEMETRY_COLLECTOR_CONFIG_FILE: "/var/task/collector.yaml"
-      Role: !Ref IngestAMPFunctionRoleARN
+          CARDINALITY_METRIC_NAME: !Ref CardinalityMetricName
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt IngestAMPQueue.QueueName
+        - arn:aws:iam::aws:policy/AmazonPrometheusRemoteWriteAccess
