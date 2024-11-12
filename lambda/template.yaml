@@ -67,7 +67,7 @@ Resources:
           Value: "AMP-Cardinality-Insights"
 
   MetricNamesFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: metric-names/
       Handler: bootstrap
@@ -83,7 +83,7 @@ Resources:
         Variables:
           AMP_WORKSPACE_ID: !Sub "${WorkspaceId}"
           SQS_QUEUE_URL: !Ref MetricsCountQueue
-       Policies:
+      Policies:
         - SQSSendMessagePolicy:
             QueueName: !GetAtt MetricsCountQueue.QueueName
         - arn:aws:iam::aws:policy/AmazonPrometheusQueryAccess
