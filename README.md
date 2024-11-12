@@ -1,4 +1,4 @@
-# Amazon Managed Service for Prometheus - Cardinality insights
+# Cardinality insights - Amazon Managed Service for Prometheus
 
 This project helps you have visibility into high cardinality metrics from an
 Amazon Managed Service for Prometheus workspace.
