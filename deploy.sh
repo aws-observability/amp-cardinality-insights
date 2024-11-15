@@ -7,7 +7,7 @@ usage(){
     return 1
 }
 
-[ $# != 2 ] && usage
+[ $# != 3 ] && usage
 
 command -v aws >/dev/null 2>&1 ||
     { echo >&2 "ERR: awscli is missing, aborting!"; exit 1; }
