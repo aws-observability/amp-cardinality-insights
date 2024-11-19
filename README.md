@@ -47,7 +47,7 @@ To deploy make sure to have the following pre-requisites:
 - Not required to deploy, but you will need a Grafana environment for visualization
 
 ```console
-./deploy.sh REGION PROMETHEUS_WORKSPACE_ID [CFN stack name]
+./deploy.sh REGION PROMETHEUS_WORKSPACE_ID [CFN stack name (optional)]
 ```
 
 ## Import Grafana dashboard

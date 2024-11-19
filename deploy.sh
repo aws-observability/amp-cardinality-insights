@@ -3,7 +3,7 @@
 set -euo pipefail
 
 usage(){
-    echo "usage ${0##*/} AWS_REGION PROMETHEUS_WORKSPACE_ID [CFN-stack-name]"
+    echo "usage ${0##*/} AWS_REGION PROMETHEUS_WORKSPACE_ID [CFN-stack-name (optional)]"
     return 1
 }
 
